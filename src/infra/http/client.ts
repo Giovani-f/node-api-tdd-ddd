@@ -8,7 +8,5 @@ export namespace HttpGetClient {
     params: object
   }
 
-  export type Result = {
-    access_token: any
-  }
+  export type Result = any
 }
