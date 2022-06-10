@@ -32,6 +32,7 @@
     "jest": "^27.1.1",
     "jest-mock-extended": "^2.0.6",
     "lint-staged": "^12.5.0",
+    "pg-mem": "^1.9.17",
     "ts-jest": "^27.0.5",
     "typescript": "^4.7.2"
   },
@@ -42,6 +43,9 @@
     "axios": "^0.27.2",
     "jsonwebtoken": "^8.5.1",
     "module-alias": "^2.2.2",
-    "rimraf": "^3.0.2"
+    "pg": "^8.7.3",
+    "reflect-metadata": "^0.1.13",
+    "rimraf": "^3.0.2",
+    "typeorm": "^0.2.29"
   }
 }
