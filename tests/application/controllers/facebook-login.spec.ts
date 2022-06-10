@@ -2,7 +2,7 @@ class FacebookLoginController {
   async handle (httpRequest: any): Promise<HttpResponse> {
     return {
       statusCode: 400,
-      data: new Error('The field token iis required')
+      data: new Error('The field token is required')
     }
   }
 }
@@ -17,7 +17,18 @@ describe('FacebookLoginController', () => {
 
     expect(httpRespose).toEqual({
       statusCode: 400,
-      data: new Error('The field token iis required')
+      data: new Error('The field token is required')
+    })
+  })
+
+  it('should return 400 if token is null', async () => {
+    const sut = new FacebookLoginController()
+
+    const httpRespose = await sut.handle({ token: null })
+
+    expect(httpRespose).toEqual({
+      statusCode: 400,
+      data: new Error('The field token is required')
     })
   })
 })
