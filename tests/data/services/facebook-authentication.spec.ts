@@ -5,7 +5,6 @@ import { TokenGenerator } from '@/data/contracts/crypto'
 import { LoadUserAccountRepository, SaveFacebookAccountRepository } from '@/data/contracts/repos'
 import { AccessToken, FacebookAccount } from '@/domain/models'
 
-import { mocked } from 'ts-jest/utils'
 import { mock, MockProxy } from 'jest-mock-extended'
 
 jest.mock('@/domain/models/facebook-account')
@@ -66,7 +65,7 @@ describe('FacebookAuthenticationService', () => {
     const FacebookAccountStub = jest.fn().mockImplementation(() => ({
       any: 'any'
     }))
-    mocked(FacebookAccount).mockImplementation(FacebookAccountStub)
+    jest.mocked(FacebookAccount).mockImplementation(FacebookAccountStub)
 
     await sut.perform({ token })
 
