@@ -13,7 +13,7 @@ class ExpressRouter {
     if (httpResponse.statusCode === 200) {
       res.status(200).json(httpResponse.data)
     } else {
-      res.status(400).json({ error: httpResponse.data.message })
+      res.status(httpResponse.statusCode).json({ error: httpResponse.data.message })
     }
   }
 }
@@ -67,6 +67,19 @@ describe('ExpressRouter', () => {
     await sut.adapt(req, res)
 
     expect(res.status).toHaveBeenCalledWith(400)
+    expect(res.status).toHaveBeenCalledTimes(1)
+    expect(res.json).toHaveBeenCalledWith({ error: 'any_error' })
+    expect(res.json).toHaveBeenCalledTimes(1)
+  })
+
+  it('should respond with 500 and valid error', async () => {
+    controller.handle.mockResolvedValueOnce({
+      statusCode: 500,
+      data: new Error('any_error')
+    })
+    await sut.adapt(req, res)
+
+    expect(res.status).toHaveBeenCalledWith(500)
     expect(res.status).toHaveBeenCalledTimes(1)
     expect(res.json).toHaveBeenCalledWith({ error: 'any_error' })
     expect(res.json).toHaveBeenCalledTimes(1)
