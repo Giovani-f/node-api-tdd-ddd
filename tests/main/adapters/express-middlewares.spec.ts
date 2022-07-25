@@ -7,6 +7,11 @@ type Adapter = (middleware: Middleware) => RequestHandler
 
 const adaptExpressMiddleware: Adapter = middleware => async (req, res, next) => {
   const { statusCode, data } = await middleware.handle({ ...req.headers })
+  if (statusCode === 200) {
+    const entries = Object.entries(data).filter(entry => entry[1])
+    req.locals = { ...req.locals, ...Object.fromEntries(entries) }
+    return next()
+  }
   res.status(statusCode).json(data)
 }
 
@@ -27,8 +32,13 @@ describe('ExpressMiddleware', () => {
     next = getMockRes().next
     middleware = mock<Middleware>()
     middleware.handle.mockResolvedValue({
-      statusCode: 500,
-      data: { error: 'any_error' }
+      statusCode: 200,
+      data: {
+        emptyProp: '',
+        nullProp: null,
+        undefinedProd: undefined,
+        prop: 'any_value'
+      }
     })
   })
 
@@ -36,14 +46,14 @@ describe('ExpressMiddleware', () => {
     sut = adaptExpressMiddleware(middleware)
   })
 
-  it('shouldd call handle with correct request', async () => {
+  it('should call handle with correct request', async () => {
     await sut(req, res, next)
 
     expect(middleware.handle).toHaveBeenCalledWith({ any: 'any' })
     expect(middleware.handle).toHaveBeenCalledTimes(1)
   })
 
-  it('shouldd call handle with empty request', async () => {
+  it('should call handle with empty request', async () => {
     req = getMockReq()
     await sut(req, res, next)
 
@@ -51,12 +61,23 @@ describe('ExpressMiddleware', () => {
     expect(middleware.handle).toHaveBeenCalledTimes(1)
   })
 
-  it('shouldd respond with correct error and statusCode', async () => {
+  it('should respond with correct error and statusCode', async () => {
+    middleware.handle.mockResolvedValueOnce({
+      statusCode: 500,
+      data: { error: 'any_error' }
+    })
     await sut(req, res, next)
 
     expect(res.status).toHaveBeenCalledWith(500)
     expect(res.status).toHaveBeenCalledTimes(1)
     expect(res.json).toHaveBeenCalledWith({ error: 'any_error' })
     expect(res.json).toHaveBeenCalledTimes(1)
+  })
+
+  it('should add valid data to req.locals', async () => {
+    await sut(req, res, next)
+
+    expect(req.locals).toEqual({ prop: 'any_value' })
+    expect(next).toHaveBeenCalledTimes(1)
   })
 })
